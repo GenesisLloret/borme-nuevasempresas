@@ -17,6 +17,11 @@ Para poder compilar este programa, debes de tener:
 ```
 npm install -g electron-packager
 ```
+👉 Previa ejecución:
+
+```
+npm install
+```
 
 👉 Para ejecutar sin compilar:
 
