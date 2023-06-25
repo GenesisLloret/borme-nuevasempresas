@@ -1,0 +1,24 @@
+{
+  "name": "borme",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start  ": "electron .",
+    "dist": "electron-packager ./"
+  },
+  "keywords": [],
+  "author": "Génesis Lloret Ramos",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^14.2.9",
+    "electron-builder": "^24.4.0",
+    "electron-dl": "^3.5.0",
+    "csv-writer": "^1.6.0",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
+    "pdf2json": "^3.0.4",
+    "pdfjs-dist": "^3.7.107",
+    "request": "^2.88.2"
+  }
+}
