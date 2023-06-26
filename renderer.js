@@ -7,13 +7,11 @@ pdfForm.addEventListener('submit', (event) => {
   const pdfUrl = pdfUrlInput.value;
   electron.sendPDFUrl(pdfUrl);
 });
-
 electron.receivePDFText((data) => {
   const array = data.split("\n");
   var dataArray = array.splice(9);
   let startIndices = [];
   let endIndices = [];
-
   for (let i = 0; i < dataArray.length; i++) {
     if (/^\d+ - /.test(dataArray[i])) {
       startIndices.push(i);
@@ -22,12 +20,21 @@ electron.receivePDFText((data) => {
       endIndices.push(i);
     }
   }
-
-  let tableHtml = "<table><tr><th>id</th><th>nombre</th><th>Comienzo de operaciones</th><th>Objeto social</th><th>capital</th><th>Mas información</th></tr>";
+  let tableHtml = "<table>"+
+    "<tr>"+
+    "<th>id</th>"+
+    "<th>nombre</th>"+
+    "<th>Comienzo de operaciones</th>"+
+    "<th>Calle</th>"+
+    "<th>Población</th>"+
+    "<th>Capital</th>"+
+    "<th>Objeto Social</th>"+
+    "<th>Otros</th>"+
+    "</tr>";
   for (let i = 0; i < startIndices.length; i++) {
     const start = startIndices[i];
     let end = endIndices.find((index) => index > start);
-    if (end === undefined) {
+    if (end === undefined || end === "undefined") {
       end = dataArray.length - 1;
     }
     const paragraphs = dataArray.slice(start, end + 1);
@@ -38,20 +45,21 @@ electron.receivePDFText((data) => {
       tableHtml += "<td>" + paragraphData.id + "</td>";
       tableHtml += "<td>" + paragraphData.name + "</td>";
       tableHtml += "<td>" + paragraphData.starter + "</td>";
-      tableHtml += "<td>" + paragraphData.info + "</td>";
+      tableHtml += "<td>" + paragraphData.calle + "</td>";
+      tableHtml += "<td>" + paragraphData.poblacion + "</td>";
       tableHtml += "<td>" + paragraphData.capital + "</td>";
+      tableHtml += "<td>" + paragraphData.objetoSocial + "</td>";
       tableHtml += "<td>" + paragraphData.otros + "</td>";
       tableHtml += "</tr>";
     }
   }
   tableHtml += "</table>";
-
   pdfTextContainer.innerHTML = tableHtml;
+  pdfForm.style.display = "none";
 });
-
 function extractParagraphData(paragraph) {
   const tmp = paragraph.split(" - ");
-  var id, name, starter, info, capital, otros = "";
+  var id, name, starter, calle, poblacion, capital, objetoSocial, otros= "";
   if (tmp.length === 2) {
     id = tmp[0].trim();
     const tmp0 = tmp[1].trim();
@@ -65,9 +73,12 @@ function extractParagraphData(paragraph) {
         if (tmp3.length === 2) {
           const tmp4 = tmp3[1].trim().split('social:')
           const tmp5 = tmp4[1].trim().split('Domicilio:');
+          objetoSocial = tmp5[0].trim();
           if (tmp5.length === 2) {
-            info = tmp5[0].trim();
             const tmp6 = tmp5[1].trim().split('Capital:')
+            const tmp6a = tmp6[0].trim().split('(');
+            calle = tmp6a[0].trim();
+            poblacion = tmp6a[1].trim().replace(").", '');
             if (tmp6.length === 2) {
               const tmp7 = tmp6[1].trim().split('Euros.');
               capital = tmp7[0].trim();
@@ -78,13 +89,5 @@ function extractParagraphData(paragraph) {
       }
     }
   }
-  return {
-    id,
-    name,
-    starter,
-    info,
-    capital,
-    otros
-  };
-}
-
+  return {id, name, starter, calle, poblacion, capital, objetoSocial, otros};
+};
